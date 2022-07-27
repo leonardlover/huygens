@@ -6,6 +6,21 @@ struct GameAssets {
 	size_t texCount;
 };
 
+enum CurrentMenu {
+	MAIN_MENU,
+	PLAY_MENU,
+	SKINS_MENU,
+	OPTIONS_MENU,
+};
+
+enum HighlightedButton {
+	NONE,
+	PLAY,
+	SKINS,
+	OPTIONS,
+	QUIT,
+};
+
 struct GameAssets *createGameAssets(void)
 {
 	struct GameAssets *assets = calloc(1, sizeof(struct GameAssets));
@@ -92,6 +107,75 @@ SDL_Texture *loadTexture(char *path, SDL_Renderer *rend)
 	return tex;
 }
 
+int loadRect(SDL_Texture *tex, SDL_Rect *rect)
+{
+	return SDL_QueryTexture(tex, NULL, NULL, &rect->w, &rect->h);
+}
+
+void scaleRect(SDL_Rect *rect, float factor)
+{
+	rect->w *= factor;
+	rect->h *= factor;
+}
+
+void setXRect(SDL_Rect *rect, int x)
+{
+	rect->x = x;
+}
+
+void setYRect(SDL_Rect *rect, int y)
+{
+	rect->y = y;
+}
+
+void setRect(SDL_Rect *rect, int x, int y)
+{
+	setXRect(rect, x);
+	setYRect(rect, y);
+}
+
+void setXPropRect(SDL_Rect *rect, float prop)
+{
+	setXRect(rect, (WIDTH - rect->w) * prop);
+}
+
+void setYPropRect(SDL_Rect *rect, float prop)
+{
+	setYRect(rect, (HEIGHT - rect->h) * prop);
+}
+
+void centerXRect(SDL_Rect *rect)
+{
+	setXPropRect(rect, 0.5);
+}
+
+void centerYRect(SDL_Rect *rect)
+{
+	setYPropRect(rect, 0.5);
+}
+
+void shiftXRect(SDL_Rect *rect, int x)
+{
+	setXRect(rect, rect->x + x);
+}
+
+void shiftYRect(SDL_Rect *rect, int y)
+{
+	setYRect(rect, rect->y + y);
+}
+
+void shiftRect(SDL_Rect *rect, int x, int y)
+{
+	shiftXRect(rect, x);
+	shiftYRect(rect, y);
+}
+
+void moveRectToRect(SDL_Rect *src, SDL_Rect *tgt)
+{
+	setRect(src, tgt->x, tgt->y);
+	shiftRect(src, (tgt->w - src->w) / 2, (tgt->h - src->h) / 2);
+}
+
 int mouseOverRect(SDL_Rect rect, int x, int y)
 {
 	if (rect.x <= x && x <= rect.x + rect.w &&
@@ -103,17 +187,12 @@ int mouseOverRect(SDL_Rect rect, int x, int y)
 
 void highlightRect(SDL_Rect *rect, float factor)
 {
-	int w, h, deltaW, deltaH;
+	int w, h;
 
 	w = rect->w;
 	h = rect->h;
 
-	rect->w *= factor;
-	rect->h *= factor;
+	scaleRect(rect, factor);
 
-	deltaW = rect->w - w;
-	deltaH = rect->h - h;
-
-	rect->x -= deltaW / 2;
-	rect->y -= deltaH / 2;
+	shiftRect(rect, (w - rect->w) / 2, (h - rect->h) / 2);
 }

@@ -6,22 +6,30 @@
 //#include <SDL2/SDL_ttf.h>
 //#include <SDL2/SDL_mixer.h>
 
-#include "utils.c"
-
 #define WIDTH 1280
 #define HEIGHT 720
 
+#include "utils.c"
+
 int main(void)
 {
+	/* WHEN GAME IS DONE DECLARE *MOST* VARIABLES HERE */
+
+	/* Create game assets, a manager for game data */
+
 	struct GameAssets *assets = createGameAssets();
 
 	if (!assets)
 		return raiseError("Memory", assets);
 	
+	/* Initialize SDL */
+
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 		return raiseError("Initialization", assets);
 
 	initAssets(assets);
+
+	/* Create game window */
 
 	SDL_Window *win = SDL_CreateWindow("Huygens",
 					   SDL_WINDOWPOS_CENTERED,
@@ -35,6 +43,8 @@ int main(void)
 
 	associateWindow(win, assets);
 
+	/* Create renderer */
+
 	SDL_Renderer *rend = SDL_CreateRenderer(win,
 						-1,
 						SDL_RENDERER_ACCELERATED |
@@ -45,6 +55,8 @@ int main(void)
 
 	associateRenderer(rend, assets);
 
+	/* Load background */
+
 	SDL_Texture *bg = loadTexture("media/img/bg.png", rend);
 
 	if (!bg)
@@ -52,6 +64,8 @@ int main(void)
 
 	if (associateTexture(bg, assets) != 0)
 		return raiseError("Memory", assets);
+
+	/* Load game name */
 
 	SDL_Texture *title = loadTexture("media/img/title.png", rend);
 
@@ -63,97 +77,131 @@ int main(void)
 
 	SDL_Rect titleRect;
 
-	if (SDL_QueryTexture(title, NULL, NULL, &titleRect.w, &titleRect.h) != 0)
+	if (loadRect(title, &titleRect) != 0)
 		return raiseError("Query", assets);
+	
+	/* Load buttons background */
 
-	titleRect.w *= 3;
-	titleRect.h *= 3;
-	titleRect.x = (WIDTH - titleRect.w) / 2;
-	titleRect.y = -titleRect.h;
+	SDL_Texture *buttonBG = loadTexture("media/img/buttonBG.png", rend);
 
-	SDL_Texture *playButton = loadTexture("media/img/playButton.png", rend);
-
-	if (!playButton)
+	if (!buttonBG)
 		return raiseError("Texture", assets);
 
-	if (associateTexture(playButton, assets) != 0)
+	if (associateTexture(buttonBG, assets) != 0)
 		return raiseError("Memory", assets);
 
-	SDL_Rect playButtonPos;
+	SDL_Rect playButtonBG, skinsButtonBG, optionsButtonBG, quitButtonBG;
 
-	if (SDL_QueryTexture(playButton, NULL, NULL, &playButtonPos.w, &playButtonPos.h) != 0)
+	if(loadRect(buttonBG, &playButtonBG) != 0)
+		return raiseError("Query", assets);
+	if(loadRect(buttonBG, &skinsButtonBG) != 0)
+		return raiseError("Query", assets);
+	if(loadRect(buttonBG, &optionsButtonBG) != 0)
+		return raiseError("Query", assets);
+	if(loadRect(buttonBG, &quitButtonBG) != 0)
 		return raiseError("Query", assets);
 
-	playButtonPos.w *= 1.5;
-	playButtonPos.h *= 1.5;
-	playButtonPos.x = (WIDTH - playButtonPos.w) / 5;
-	playButtonPos.y = (HEIGHT - playButtonPos.h) * 3 / 5;
+	/* Load play text */
 
-	SDL_Texture *skinsButton = loadTexture("media/img/skinsButton.png", rend);
+	SDL_Texture *playText = loadTexture("media/img/playText.png", rend);
 
-	if (!skinsButton)
+	if (!playText)
 		return raiseError("Texture", assets);
 
-	if (associateTexture(skinsButton, assets) != 0)
+	if (associateTexture(playText, assets) != 0)
 		return raiseError("Memory", assets);
 
-	SDL_Rect skinsButtonPos;
+	SDL_Rect playTextRect;
 
-	if (SDL_QueryTexture(skinsButton, NULL, NULL, &skinsButtonPos.w, &skinsButtonPos.h) != 0)
+	if (loadRect(playText, &playTextRect) != 0)
 		return raiseError("Query", assets);
 
-	skinsButtonPos.w *= 1.5;
-	skinsButtonPos.h *= 1.5;
-	skinsButtonPos.x = (WIDTH - skinsButtonPos.w) * 4 / 5;
-	skinsButtonPos.y = (HEIGHT - skinsButtonPos.h) * 3 / 5;
+	/* Load skins text */
 
-	SDL_Texture *optionsButton = loadTexture("media/img/optionsButton.png", rend);
+	SDL_Texture *skinsText = loadTexture("media/img/skinsText.png", rend);
 
-	if (!optionsButton)
+	if (!skinsText)
 		return raiseError("Texture", assets);
 
-	if (associateTexture(optionsButton, assets) != 0)
+	if (associateTexture(skinsText, assets) != 0)
 		return raiseError("Memory", assets);
 
-	SDL_Rect optionsButtonPos;
+	SDL_Rect skinsTextRect;
 
-	if (SDL_QueryTexture(optionsButton, NULL, NULL, &optionsButtonPos.w, &optionsButtonPos.h) != 0)
+	if (loadRect(skinsText, &skinsTextRect) != 0)
 		return raiseError("Query", assets);
 
-	optionsButtonPos.w *= 1.5;
-	optionsButtonPos.h *= 1.5;
-	optionsButtonPos.x = (WIDTH - optionsButtonPos.w) / 5;
-	optionsButtonPos.y = (HEIGHT - optionsButtonPos.h) * 4 / 5;
+	/* Load options text */
 
-	SDL_Texture *quitButton = loadTexture("media/img/quitButton.png", rend);
+	SDL_Texture *optionsText = loadTexture("media/img/optionsText.png", rend);
 
-	if (!quitButton)
+	if (!optionsText)
 		return raiseError("Texture", assets);
 
-	if (associateTexture(quitButton, assets) != 0)
+	if (associateTexture(optionsText, assets) != 0)
 		return raiseError("Memory", assets);
 
-	SDL_Rect quitButtonPos;
+	SDL_Rect optionsTextRect;
 
-	if (SDL_QueryTexture(quitButton, NULL, NULL, &quitButtonPos.w, &quitButtonPos.h) != 0)
+	if (loadRect(optionsText, &optionsTextRect) != 0)
 		return raiseError("Query", assets);
 
-	quitButtonPos.w *= 1.5;
-	quitButtonPos.h *= 1.5;
-	quitButtonPos.x = (WIDTH - quitButtonPos.w) * 4 / 5;
-	quitButtonPos.y = (HEIGHT - quitButtonPos.h) * 4 / 5;
+	/* Load quit text */
 
-	int mouseX, mouseY, leftClick;
+	SDL_Texture *quitText = loadTexture("media/img/quitText.png", rend);
 
-	int inGame = 0;
-	int hltd = 0;
+	if (!quitText)
+		return raiseError("Texture", assets);
+
+	if (associateTexture(quitText, assets) != 0)
+		return raiseError("Memory", assets);
+
+	SDL_Rect quitTextRect;
+
+	if (loadRect(quitText, &quitTextRect) != 0)
+		return raiseError("Query", assets);
+
+	/* Set rectangles positions and sizes */
+
+	scaleRect(&titleRect, 3);
+	centerXRect(&titleRect);
+	setYRect(&titleRect, titleRect.h / 2);
+
+	scaleRect(&playButtonBG, 0.75);
+	setXPropRect(&playButtonBG, 0.2);
+	setYPropRect(&playButtonBG, 0.6);
+	
+	scaleRect(&skinsButtonBG, 0.75);
+	setXPropRect(&skinsButtonBG, 0.8);
+	setYPropRect(&skinsButtonBG, 0.6);
+
+	scaleRect(&optionsButtonBG, 0.75);
+	setXPropRect(&optionsButtonBG, 0.2);
+	setYPropRect(&optionsButtonBG, 0.8);
+
+	scaleRect(&quitButtonBG, 0.75);
+	setXPropRect(&quitButtonBG, 0.8);
+	setYPropRect(&quitButtonBG, 0.8);
+
+	moveRectToRect(&playTextRect, &playButtonBG);
+	moveRectToRect(&skinsTextRect, &skinsButtonBG);
+	moveRectToRect(&optionsTextRect, &optionsButtonBG);
+	moveRectToRect(&quitTextRect, &quitButtonBG);
+
+	/* Set up game loop variables WILL BE DEPRECATED */
+
 	int quit = 0;
 
+	enum CurrentMenu menu = MAIN_MENU;
+	enum HighlightedButton hltd = NONE;
+
+	int mouseX, mouseY;
+	int leftClick = 0;
+	int inGame = 0;
+
+	SDL_Event event;
+
 	while (!quit) {
-		SDL_Event event;
-
-		leftClick = 0;
-
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
 			case SDL_QUIT:
@@ -162,6 +210,10 @@ int main(void)
 			case SDL_MOUSEBUTTONDOWN:
 				if (event.button.button == SDL_BUTTON_LEFT)
 					leftClick = 1;
+				break;
+			case SDL_MOUSEBUTTONUP:
+				if (leftClick)
+					leftClick = 0;
 			default:
 				break;
 			}
@@ -169,41 +221,69 @@ int main(void)
 
 		SDL_GetMouseState(&mouseX, &mouseY);
 
-		if (mouseOverRect(playButtonPos, mouseX, mouseY) && leftClick)
-			inGame = 1;
-		if (!inGame) {
-			titleRect.y += 200 / 60;
-
-			if (titleRect.y >= titleRect.h / 2)
-				titleRect.y = titleRect.h / 2;
-
-			if (mouseOverRect(playButtonPos, mouseX, mouseY)) {
-				if (!hltd) {
-					highlightRect(&playButtonPos, 1.1);
-					hltd = 1;
+		switch (menu) {
+		case MAIN_MENU:
+			switch (hltd) {
+			case NONE:
+				if (mouseOverRect(playButtonBG, mouseX, mouseY)) {
+					highlightRect(&playButtonBG, 1.1);
+					hltd = PLAY;
 				}
-			} else {
-				if (hltd) {
-					highlightRect(&playButtonPos, 1 / 1.1);
-					hltd = 0;
-				}
+				break;
+			default:
+				break;
 			}
 
-			if (mouseOverRect(quitButtonPos, mouseX, mouseY) && leftClick)
+			if (mouseOverRect(playButtonBG, mouseX, mouseY) && hltd != PLAY) {
+				highlightRect(&playButtonBG, 1.1);
+				hltd = PLAY;
+			} else if (hltd == PLAY) {
+				highlightRect(&playButtonBG, 1 / 1.1);
+				hltd = NONE;
+			}
+
+			if (mouseOverRect(skinsButtonBG, mouseX, mouseY) && hltd != SKINS) {
+				highlightRect(&skinsButtonBG, 1.1);
+				hltd = SKINS;
+			} else if (hltd == SKINS) {
+				highlightRect(&skinsButtonBG, 1 / 1.1);
+				hltd = NONE;
+			}
+
+			if (mouseOverRect(optionsButtonBG, mouseX, mouseY) && hltd != OPTIONS) {
+				highlightRect(&optionsButtonBG, 1.1);
+				hltd = OPTIONS;
+			} else if (hltd == OPTIONS) {
+				highlightRect(&optionsButtonBG, 1 / 1.1);
+				hltd = NONE;
+			}
+
+			if (mouseOverRect(quitButtonBG, mouseX, mouseY) && hltd != QUIT) {
+				highlightRect(&quitButtonBG, 1.1);
+				hltd = QUIT;
+			} else if (hltd == QUIT) {
+				highlightRect(&quitButtonBG, 1 / 1.1);
+				hltd = NONE;
+			}
+
+			if (mouseOverRect(quitButtonBG, mouseX, mouseY) && leftClick)
 				quit = 1;
 
 			SDL_RenderClear(rend);
 			SDL_RenderCopy(rend, bg, NULL, NULL);
 			SDL_RenderCopy(rend, title, NULL, &titleRect);
-			SDL_RenderCopy(rend, playButton, NULL, &playButtonPos);
-			SDL_RenderCopy(rend, skinsButton, NULL, &skinsButtonPos);
-			SDL_RenderCopy(rend, optionsButton, NULL, &optionsButtonPos);
-			SDL_RenderCopy(rend, quitButton, NULL, &quitButtonPos);
+			SDL_RenderCopy(rend, buttonBG, NULL, &playButtonBG);
+			SDL_RenderCopy(rend, buttonBG, NULL, &skinsButtonBG);
+			SDL_RenderCopy(rend, buttonBG, NULL, &optionsButtonBG);
+			SDL_RenderCopy(rend, playText, NULL, &playTextRect);
+			SDL_RenderCopy(rend, skinsText, NULL, &skinsTextRect);
+			SDL_RenderCopy(rend, optionsText, NULL, &optionsTextRect);
+			SDL_RenderCopy(rend, buttonBG, NULL, &quitButtonBG);
+			SDL_RenderCopy(rend, quitText, NULL, &quitTextRect);
 		
 			SDL_RenderPresent(rend);
-		} else {
-			SDL_RenderClear(rend);
-			SDL_RenderPresent(rend);
+		default:
+			break;
 		}
 
 		SDL_Delay(1000 / 60);
