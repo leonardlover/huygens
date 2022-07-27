@@ -6,37 +6,22 @@
 //#include <SDL2/SDL_ttf.h>
 //#include <SDL2/SDL_mixer.h>
 
-#include "errors.c"
+#include "utils.c"
 
 #define WIDTH 1280
 #define HEIGHT 720
 
-SDL_Texture *loadTexture(char *path, SDL_Renderer *rend)
-{
-	SDL_Surface *surf = IMG_Load(path);
-
-	if (!surf)
-		return NULL;
-
-	SDL_Texture *tex = SDL_CreateTextureFromSurface(rend, surf);
-	SDL_FreeSurface(surf);
-
-	return tex;
-}
-
-int cursorOverRect(SDL_Rect rect, int x, int y)
-{
-	if (rect.x <= x && x <= rect.x + rect.w &&
-	    rect.y <= y && y <= rect.y + rect.h)
-			return 1;
-
-	return 0;
-}
-
 int main(void)
 {
+	struct GameAssets *assets = createGameAssets();
+
+	if (!assets)
+		return raiseError("Memory", assets);
+	
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
-		return initError();
+		return raiseError("Initialization", assets);
+
+	initAssets(assets);
 
 	SDL_Window *win = SDL_CreateWindow("Huygens",
 					   SDL_WINDOWPOS_CENTERED,
@@ -46,7 +31,9 @@ int main(void)
 					   0);
 
 	if (!win)
-		return windowError();
+		return raiseError("Window", assets);
+
+	associateWindow(win, assets);
 
 	SDL_Renderer *rend = SDL_CreateRenderer(win,
 						-1,
@@ -54,29 +41,37 @@ int main(void)
 						SDL_RENDERER_PRESENTVSYNC);
 
 	if (!rend)
-		return rendererError(win);
+		return raiseError("Renderer", assets);
+
+	associateRenderer(rend, assets);
 
 	SDL_Texture *bg = loadTexture("media/img/bg.png", rend);
 
 	if (!bg)
-		return textureError(rend, win);
+		return raiseError("Texture", assets);
+
+	if (associateTexture(bg, assets) != 0)
+		return raiseError("Memory", assets);
 
 	SDL_Texture *title = loadTexture("media/img/title.png", rend);
 
 	if (!title)
-		return textureError(rend, win);
+		return raiseError("Texture", assets);
 
-	SDL_Rect pos;
+	if (associateTexture(title, assets) != 0)
+		return raiseError("Memory", assets);
 
-	if (SDL_QueryTexture(title, NULL, NULL, &pos.w, &pos.h) != 0)
-		return queryError(title, rend, win);
+	SDL_Rect titleRect;
 
-	pos.w *= 3;
-	pos.h *= 3;
-	pos.x = (WIDTH - pos.w) / 2;
-	pos.y = -pos.h;
+	if (SDL_QueryTexture(title, NULL, NULL, &titleRect.w, &titleRect.h) != 0)
+		return raiseError("Query", assets);
 
-	SDL_Texture *stars[20];
+	titleRect.w *= 3;
+	titleRect.h *= 3;
+	titleRect.x = (WIDTH - titleRect.w) / 2;
+	titleRect.y = -titleRect.h;
+
+	/*SDL_Texture *stars[20];
 	SDL_Rect starsPos[20];
 
 	for (int i = 0; i < 20; i++) {
@@ -92,22 +87,25 @@ int main(void)
 		starsPos[i].h *= 5;
 		starsPos[i].x = rand() % WIDTH;
 		starsPos[i].y = -starsPos[i].h - rand() % HEIGHT;
-	}
+	}*/
 
-	SDL_Texture *button = loadTexture("media/img/heart.png", rend);
+	SDL_Texture *playButton = loadTexture("media/img/playButton.png", rend);
 
-	if (!button)
-		return textureError(rend, win);
+	if (!playButton)
+		return raiseError("Texture", assets);
 
-	SDL_Rect buttonPos;
+	if (associateTexture(playButton, assets) != 0)
+		return raiseError("Memory", assets);
 
-	if (SDL_QueryTexture(button, NULL, NULL, &buttonPos.w, &buttonPos.h) != 0)
-		return queryError(button, rend, win);
+	SDL_Rect playButtonPos;
 
-	buttonPos.w *= 8;
-	buttonPos.h *= 8;
-	buttonPos.x = (WIDTH - buttonPos.w) / 2;
-	buttonPos.y = (HEIGHT - buttonPos.h) / 2;
+	if (SDL_QueryTexture(playButton, NULL, NULL, &playButtonPos.w, &playButtonPos.h) != 0)
+		return raiseError("Query", assets);
+
+	playButtonPos.w *= 2;
+	playButtonPos.h *= 2;
+	playButtonPos.x = (WIDTH - playButtonPos.w) / 2;
+	playButtonPos.y = (HEIGHT - playButtonPos.h) / 2;
 
 	int mouseX, mouseY, leftClick;
 
@@ -135,28 +133,28 @@ int main(void)
 
 		SDL_GetMouseState(&mouseX, &mouseY);
 
-		if (cursorOverRect(buttonPos, mouseX, mouseY) && leftClick)
+		if (mouseOverRect(playButtonPos, mouseX, mouseY) && leftClick)
 			inGame = 1;
 		if (!inGame) {
-			pos.y += 200 / 60;
+			titleRect.y += 200 / 60;
 
-			if (pos.y >= pos.h / 2)
-				pos.y = pos.h / 2;
+			if (titleRect.y >= titleRect.h / 2)
+				titleRect.y = titleRect.h / 2;
 
-			for (int i = 0; i < 20; i++) {
+			/*for (int i = 0; i < 20; i++) {
 				starsPos[i].y += 150 / 60;
 
 				if (starsPos[i].y >= HEIGHT)
 					starsPos[i].y = HEIGHT;
-			}
+			}*/
 
 			SDL_RenderClear(rend);
 			SDL_RenderCopy(rend, bg, NULL, NULL);
-			SDL_RenderCopy(rend, title, NULL, &pos);
-			SDL_RenderCopy(rend, button, NULL, &buttonPos);
+			SDL_RenderCopy(rend, title, NULL, &titleRect);
+			SDL_RenderCopy(rend, playButton, NULL, &playButtonPos);
 		
-			for (int i = 0; i < 20; i++)
-				SDL_RenderCopy(rend, stars[i], NULL, &starsPos[i]);
+			//for (int i = 0; i < 20; i++)
+				//SDL_RenderCopy(rend, stars[i], NULL, &starsPos[i]);
 
 			SDL_RenderPresent(rend);
 		} else {
@@ -167,15 +165,7 @@ int main(void)
 		SDL_Delay(1000 / 60);
 	}
 
-	for (int i = 0; i < 20; i++)
-		SDL_DestroyTexture(stars[i]);
-
-	SDL_DestroyTexture(button);
-	SDL_DestroyTexture(title);
-	SDL_DestroyTexture(bg);
-	SDL_DestroyRenderer(rend);
-	SDL_DestroyWindow(win);
-	SDL_Quit();
+	killGame(assets);
 
 	return 0;
 }
