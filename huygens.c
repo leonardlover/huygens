@@ -8,6 +8,7 @@
 
 #define WIDTH 1280
 #define HEIGHT 720
+#define HLFACTOR 1.1
 
 #include "utils.c"
 
@@ -226,44 +227,44 @@ int main(void)
 			switch (hltd) {
 			case NONE:
 				if (mouseOverRect(playButtonBG, mouseX, mouseY)) {
-					highlightRect(&playButtonBG, 1.1);
+					highlightRect(&playButtonBG, HLFACTOR);
 					hltd = PLAY;
+				} else if (mouseOverRect(skinsButtonBG, mouseX, mouseY)) {
+					highlightRect(&skinsButtonBG, HLFACTOR);
+					hltd = SKINS;
+				} else if (mouseOverRect(optionsButtonBG, mouseX, mouseY)) {
+					highlightRect(&optionsButtonBG, HLFACTOR);
+					hltd = OPTIONS;
+				} else if (mouseOverRect(quitButtonBG, mouseX, mouseY)) {
+					highlightRect(&quitButtonBG, HLFACTOR);
+					hltd = QUIT;
 				}
 				break;
+			case PLAY:
+				if (!mouseOverRect(playButtonBG, mouseX, mouseY)) {
+					highlightRect(&playButtonBG, 1 / HLFACTOR);
+					hltd = NONE;
+				}
+				break;
+			case SKINS:
+				if (!mouseOverRect(skinsButtonBG, mouseX, mouseY)) {
+					highlightRect(&skinsButtonBG, 1 / HLFACTOR);
+					hltd = NONE;
+				}
+				break;
+			case OPTIONS:
+				if (!mouseOverRect(optionsButtonBG, mouseX, mouseY)) {
+					highlightRect(&optionsButtonBG, 1 / HLFACTOR);
+					hltd = NONE;
+				}
+				break;
+			case QUIT:
+				if (!mouseOverRect(quitButtonBG, mouseX, mouseY)) {
+					highlightRect(&quitButtonBG, 1 / HLFACTOR);
+					hltd = NONE;
+				}
 			default:
 				break;
-			}
-
-			if (mouseOverRect(playButtonBG, mouseX, mouseY) && hltd != PLAY) {
-				highlightRect(&playButtonBG, 1.1);
-				hltd = PLAY;
-			} else if (hltd == PLAY) {
-				highlightRect(&playButtonBG, 1 / 1.1);
-				hltd = NONE;
-			}
-
-			if (mouseOverRect(skinsButtonBG, mouseX, mouseY) && hltd != SKINS) {
-				highlightRect(&skinsButtonBG, 1.1);
-				hltd = SKINS;
-			} else if (hltd == SKINS) {
-				highlightRect(&skinsButtonBG, 1 / 1.1);
-				hltd = NONE;
-			}
-
-			if (mouseOverRect(optionsButtonBG, mouseX, mouseY) && hltd != OPTIONS) {
-				highlightRect(&optionsButtonBG, 1.1);
-				hltd = OPTIONS;
-			} else if (hltd == OPTIONS) {
-				highlightRect(&optionsButtonBG, 1 / 1.1);
-				hltd = NONE;
-			}
-
-			if (mouseOverRect(quitButtonBG, mouseX, mouseY) && hltd != QUIT) {
-				highlightRect(&quitButtonBG, 1.1);
-				hltd = QUIT;
-			} else if (hltd == QUIT) {
-				highlightRect(&quitButtonBG, 1 / 1.1);
-				hltd = NONE;
 			}
 
 			if (mouseOverRect(quitButtonBG, mouseX, mouseY) && leftClick)
