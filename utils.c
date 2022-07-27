@@ -100,3 +100,20 @@ int mouseOverRect(SDL_Rect rect, int x, int y)
 
 	return 0;
 }
+
+void highlightRect(SDL_Rect *rect, float factor)
+{
+	int w, h, deltaW, deltaH;
+
+	w = rect->w;
+	h = rect->h;
+
+	rect->w *= factor;
+	rect->h *= factor;
+
+	deltaW = rect->w - w;
+	deltaH = rect->h - h;
+
+	rect->x -= deltaW / 2;
+	rect->y -= deltaH / 2;
+}
