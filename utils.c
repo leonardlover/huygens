@@ -154,6 +154,12 @@ void centerYRect(SDL_Rect *rect)
 	setYPropRect(rect, 0.5);
 }
 
+void centerRect(SDL_Rect *rect)
+{
+	centerXRect(rect);
+	centerYRect(rect);
+}
+
 void shiftXRect(SDL_Rect *rect, int x)
 {
 	setXRect(rect, rect->x + x);

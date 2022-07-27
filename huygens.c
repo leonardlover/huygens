@@ -68,17 +68,17 @@ int main(void)
 
 	/* Load game name */
 
-	SDL_Texture *title = loadTexture("media/img/title.png", rend);
+	SDL_Texture *gameTitle = loadTexture("media/img/gameTitle.png", rend);
 
-	if (!title)
+	if (!gameTitle)
 		return raiseError("Texture", assets);
 
-	if (associateTexture(title, assets) != 0)
+	if (associateTexture(gameTitle, assets) != 0)
 		return raiseError("Memory", assets);
 
-	SDL_Rect titleRect;
+	SDL_Rect gameTitleRect;
 
-	if (loadRect(title, &titleRect) != 0)
+	if (loadRect(gameTitle, &gameTitleRect) != 0)
 		return raiseError("Query", assets);
 	
 	/* Load buttons background */
@@ -162,11 +162,103 @@ int main(void)
 	if (loadRect(quitText, &quitTextRect) != 0)
 		return raiseError("Query", assets);
 
+	/* Load skins title */
+
+	SDL_Texture *skinsTitle = loadTexture("media/img/skinsTitle.png", rend);
+
+	if (!skinsTitle)
+		return raiseError("Texture", assets);
+
+	if (associateTexture(skinsTitle, assets) != 0)
+		return raiseError("Memory", assets);
+
+	SDL_Rect skinsTitleRect;
+
+	if(loadRect(skinsTitle, &skinsTitleRect) != 0)
+		return raiseError("Query", assets);
+
+	/* Load frame */
+
+	SDL_Texture *frame = loadTexture("media/img/frame.png", rend);
+
+	if (!frame)
+		return raiseError("Texture", assets);
+
+	if (associateTexture(frame, assets) != 0)
+		return raiseError("Memory", assets);
+
+	SDL_Rect frameRect;
+
+	if(loadRect(frame, &frameRect) != 0)
+		return raiseError("Query", assets);
+	
+	/* Load left arrow */
+
+	SDL_Texture *leftArrow = loadTexture("media/img/leftArrow.png", rend);
+
+	if (!leftArrow)
+		return raiseError("Texture", assets);
+
+	if (associateTexture(leftArrow, assets) != 0)
+		return raiseError("Memory", assets);
+
+	SDL_Rect leftArrowRect;
+
+	if(loadRect(leftArrow, &leftArrowRect) != 0)
+		return raiseError("Query", assets);
+
+	/* Load right arrow */
+
+	SDL_Texture *rightArrow = loadTexture("media/img/rightArrow.png", rend);
+
+	if (!rightArrow)
+		return raiseError("Texture", assets);
+
+	if (associateTexture(rightArrow, assets) != 0)
+		return raiseError("Memory", assets);
+
+	SDL_Rect rightArrowRect;
+
+	if(loadRect(rightArrow, &rightArrowRect) != 0)
+		return raiseError("Query", assets);
+
+	/* Load back arrow */
+
+	SDL_Texture *backArrow = loadTexture("media/img/backArrow.png", rend);
+
+	if (!backArrow)
+		return raiseError("Texture", assets);
+
+	if (associateTexture(backArrow, assets) != 0)
+		return raiseError("Memory", assets);
+
+	SDL_Rect backArrowRect;
+
+	if(loadRect(backArrow, &backArrowRect) != 0)
+		return raiseError("Query", assets);
+
+	/* Load equip text */
+
+	SDL_Texture *equipText = loadTexture("media/img/equipText.png", rend);
+
+	if (!equipText)
+		return raiseError("Texture", assets);
+
+	if (associateTexture(equipText, assets) != 0)
+		return raiseError("Memory", assets);
+
+	SDL_Rect equipTextRect;
+
+	if(loadRect(equipText, &equipTextRect) != 0)
+		return raiseError("Query", assets);
+
 	/* Set rectangles positions and sizes */
 
-	scaleRect(&titleRect, 3);
-	centerXRect(&titleRect);
-	setYRect(&titleRect, titleRect.h / 2);
+	/* Main menu assets */
+
+	scaleRect(&gameTitleRect, 3);
+	centerXRect(&gameTitleRect);
+	setYRect(&gameTitleRect, gameTitleRect.h / 2);
 
 	scaleRect(&playButtonBG, 0.75);
 	setXPropRect(&playButtonBG, 0.2);
@@ -189,6 +281,11 @@ int main(void)
 	moveRectToRect(&optionsTextRect, &optionsButtonBG);
 	moveRectToRect(&quitTextRect, &quitButtonBG);
 
+	/* Skins menu assets */
+
+	scaleRect(&frameRect, 5);
+	centerRect(&frameRect);
+
 	/* Set up game loop variables WILL BE DEPRECATED */
 
 	int quit = 0;
@@ -198,7 +295,6 @@ int main(void)
 
 	int mouseX, mouseY;
 	int leftClick = 0;
-	int inGame = 0;
 
 	SDL_Event event;
 
@@ -222,8 +318,12 @@ int main(void)
 
 		SDL_GetMouseState(&mouseX, &mouseY);
 
+		/* Manage menus */
+
 		switch (menu) {
 		case MAIN_MENU:
+			/* Highlight button under cursor */
+
 			switch (hltd) {
 			case NONE:
 				if (mouseOverRect(playButtonBG, mouseX, mouseY)) {
@@ -267,12 +367,23 @@ int main(void)
 				break;
 			}
 
-			if (mouseOverRect(quitButtonBG, mouseX, mouseY) && leftClick)
+			/* Change current menu if button is pressed */
+
+			if (hltd == PLAY && leftClick)
+				menu = PLAY_MENU;
+			if (hltd == SKINS && leftClick)
+				menu = SKINS_MENU;
+			if (hltd == OPTIONS && leftClick)
+				menu = OPTIONS_MENU;
+			if (hltd == QUIT && leftClick)
 				quit = 1;
 
+			/* Render menu */
+
 			SDL_RenderClear(rend);
+
 			SDL_RenderCopy(rend, bg, NULL, NULL);
-			SDL_RenderCopy(rend, title, NULL, &titleRect);
+			SDL_RenderCopy(rend, gameTitle, NULL, &gameTitleRect);
 			SDL_RenderCopy(rend, buttonBG, NULL, &playButtonBG);
 			SDL_RenderCopy(rend, buttonBG, NULL, &skinsButtonBG);
 			SDL_RenderCopy(rend, buttonBG, NULL, &optionsButtonBG);
@@ -283,6 +394,19 @@ int main(void)
 			SDL_RenderCopy(rend, quitText, NULL, &quitTextRect);
 		
 			SDL_RenderPresent(rend);
+			break;
+		case PLAY_MENU:
+			break;
+		case SKINS_MENU:
+			/* Render menu */
+
+			SDL_RenderClear(rend);
+			SDL_RenderCopy(rend, bg, NULL, NULL);
+			SDL_RenderCopy(rend, frame, NULL, &frameRect);
+			SDL_RenderPresent(rend);
+
+			break;
+		case OPTIONS_MENU:
 		default:
 			break;
 		}
