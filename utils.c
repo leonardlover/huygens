@@ -112,10 +112,20 @@ int loadRect(SDL_Texture *tex, SDL_Rect *rect)
 	return SDL_QueryTexture(tex, NULL, NULL, &rect->w, &rect->h);
 }
 
-void scaleRect(SDL_Rect *rect, float factor)
+void scaleXRect(SDL_Rect *rect, float factor)
 {
 	rect->w *= factor;
+}
+
+void scaleYRect(SDL_Rect *rect, float factor)
+{
 	rect->h *= factor;
+}
+
+void scaleRect(SDL_Rect *rect, float factor)
+{
+	scaleXRect(rect, factor);
+	scaleYRect(rect, factor);
 }
 
 void setXRect(SDL_Rect *rect, int x)

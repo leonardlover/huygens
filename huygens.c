@@ -222,21 +222,6 @@ int main(void)
 	if(loadRect(rightArrow, &rightArrowRect) != 0)
 		return raiseError("Query", assets);
 
-	/* Load back arrow */
-
-	SDL_Texture *backArrow = loadTexture("media/img/backArrow.png", rend);
-
-	if (!backArrow)
-		return raiseError("Texture", assets);
-
-	if (associateTexture(backArrow, assets) != 0)
-		return raiseError("Memory", assets);
-
-	SDL_Rect backArrowRect;
-
-	if(loadRect(backArrow, &backArrowRect) != 0)
-		return raiseError("Query", assets);
-
 	/* Load equip text */
 
 	SDL_Texture *equipText = loadTexture("media/img/equipText.png", rend);
@@ -255,6 +240,21 @@ int main(void)
 	SDL_Rect equipButtonBG;
 
 	if (loadRect(buttonBG, &equipButtonBG) != 0)
+		return raiseError("Query", assets);
+
+	/* Load back arrow */
+
+	SDL_Texture *backArrow = loadTexture("media/img/backArrow.png", rend);
+
+	if (!backArrow)
+		return raiseError("Texture", assets);
+
+	if (associateTexture(backArrow, assets) != 0)
+		return raiseError("Memory", assets);
+
+	SDL_Rect backArrowRect;
+
+	if(loadRect(backArrow, &backArrowRect) != 0)
 		return raiseError("Query", assets);
 
 	/* Set rectangles positions and sizes */
@@ -303,14 +303,14 @@ int main(void)
 	centerYRect(&rightArrowRect);
 	setXPropRect(&rightArrowRect, 0.66);
 
-	scaleRect(&backArrowRect, 2);
-	setRect(&backArrowRect, backArrowRect.w / 2, backArrowRect.h / 2);
-
 	scaleRect(&equipButtonBG, 0.75);
 	centerRect(&equipButtonBG);
 	setYPropRect(&equipButtonBG, 0.9);
 
 	moveRectToRect(&equipTextRect, &equipButtonBG);
+
+	scaleRect(&backArrowRect, 2);
+	setRect(&backArrowRect, backArrowRect.w / 2, backArrowRect.h / 2);
 
 	/* Set up game loop variables WILL BE DEPRECATED */
 
@@ -435,9 +435,9 @@ int main(void)
 			SDL_RenderCopy(rend, frame, NULL, &frameRect);
 			SDL_RenderCopy(rend, leftArrow, NULL, &leftArrowRect);
 			SDL_RenderCopy(rend, rightArrow, NULL, &rightArrowRect);
-			SDL_RenderCopy(rend, backArrow, NULL, &backArrowRect);
 			SDL_RenderCopy(rend, buttonBG, NULL, &equipButtonBG);
 			SDL_RenderCopy(rend, equipText, NULL, &equipTextRect);
+			SDL_RenderCopy(rend, backArrow, NULL, &backArrowRect);
 			SDL_RenderPresent(rend);
 
 			break;
