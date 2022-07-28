@@ -310,7 +310,6 @@ int main(void)
 	centerRect(&equipButtonBG);
 	setYPropRect(&equipButtonBG, 0.9);
 
-	scaleRect(&equipTextRect, 4);
 	moveRectToRect(&equipTextRect, &equipButtonBG);
 
 	/* Set up game loop variables WILL BE DEPRECATED */
@@ -426,6 +425,9 @@ int main(void)
 			break;
 		case SKINS_MENU:
 			/* Render menu */
+
+			if (mouseOverRect(backArrowRect, mouseX, mouseY) && leftClick)
+				menu = MAIN_MENU;
 
 			SDL_RenderClear(rend);
 			SDL_RenderCopy(rend, bg, NULL, NULL);
