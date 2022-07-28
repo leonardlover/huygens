@@ -316,7 +316,7 @@ int main(void)
 
 	int quit = 0;
 
-	enum CurrentMenu menu = MAIN_MENU;
+	enum Menu menu = MAIN_MENU;
 	enum HighlightedButton hltd = NONE;
 
 	int mouseX, mouseY;

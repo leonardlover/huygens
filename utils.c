@@ -6,7 +6,7 @@ struct GameAssets {
 	size_t texCount;
 };
 
-enum CurrentMenu {
+enum Menu {
 	MAIN_MENU,
 	PLAY_MENU,
 	SKINS_MENU,
