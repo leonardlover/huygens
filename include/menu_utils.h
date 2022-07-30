@@ -14,6 +14,7 @@ enum Menu {
 
 
 enum Button {
+	NONE,
 	PLAY,
 	SKINS,
 	OPTIONS,
