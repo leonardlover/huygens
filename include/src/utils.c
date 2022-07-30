@@ -48,6 +48,7 @@ void printError(enum ErrorType *error)
 		break;
 	case QUERY:
 		errorMsg = "Query";
+		break;
 	default:
 		break;
 	}
