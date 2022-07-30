@@ -13,7 +13,7 @@ enum Menu {
 };
 
 
-enum HighlightedButton {
+enum Button {
 	PLAY,
 	SKINS,
 	OPTIONS,
