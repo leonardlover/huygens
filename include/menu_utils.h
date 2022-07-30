@@ -14,7 +14,6 @@ enum Menu {
 
 
 enum HighlightedButton {
-	NONE,
 	PLAY,
 	SKINS,
 	OPTIONS,
