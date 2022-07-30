@@ -11,10 +11,10 @@ utils.o:
 	@echo "Compiling..."
 	@$(CC) -c $(OBJSRCDIR)/$(@:.o=.c) -I$(INCLUDEDIR)
 
-rect_utils.o:
+asset_utils.o:
 	@$(CC) -c $(OBJSRCDIR)/$(@:.o=.c) -I$(INCLUDEDIR)
 
-$(EXE): utils.o rect_utils.o
+$(EXE): utils.o asset_utils.o
 	@$(CC) $(SRC) -o $@ $^ -I$(INCLUDEDIR) $(CFLAGS)
 
 .PHONY: clean

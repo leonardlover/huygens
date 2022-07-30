@@ -7,7 +7,7 @@
 //#include <SDL2/SDL_mixer.h>
 
 #include "utils.h"
-#include "rect_utils.h"
+#include "asset_utils.h"
 #include "menu_utils.h"
 
 #define FPS 60
@@ -162,30 +162,30 @@ int main(void)
 				if (!quitText)
 					return raiseError(error, assets);
 
-				scaleRect(gameTitle->rect, 3);
-				centerXRect(gameTitle->rect);
-				setYRect(gameTitle->rect, (gameTitle->rect)->h / 2);
+				scaleAsset(gameTitle, 3);
+				centerXAsset(gameTitle);
+				setYAsset(gameTitle, (gameTitle->rect)->h / 2);
 
-				scaleRect(playButtonBG->rect, 0.75);
-				setXPropRect(playButtonBG->rect, 0.2);
-				setYPropRect(playButtonBG->rect, 0.6);
+				scaleAsset(playButtonBG, 0.75);
+				setXPropAsset(playButtonBG, 0.2);
+				setYPropAsset(playButtonBG, 0.6);
 				
-				scaleRect(skinsButtonBG->rect, 0.75);
-				setXPropRect(skinsButtonBG->rect, 0.8);
-				setYPropRect(skinsButtonBG->rect, 0.6);
+				scaleAsset(skinsButtonBG, 0.75);
+				setXPropAsset(skinsButtonBG, 0.8);
+				setYPropAsset(skinsButtonBG, 0.6);
 
-				scaleRect(optionsButtonBG->rect, 0.75);
-				setXPropRect(optionsButtonBG->rect, 0.2);
-				setYPropRect(optionsButtonBG->rect, 0.8);
+				scaleAsset(optionsButtonBG, 0.75);
+				setXPropAsset(optionsButtonBG, 0.2);
+				setYPropAsset(optionsButtonBG, 0.8);
 
-				scaleRect(quitButtonBG->rect, 0.75);
-				setXPropRect(quitButtonBG->rect, 0.8);
-				setYPropRect(quitButtonBG->rect, 0.8);
+				scaleAsset(quitButtonBG, 0.75);
+				setXPropAsset(quitButtonBG, 0.8);
+				setYPropAsset(quitButtonBG, 0.8);
 
-				moveRectToRect(playText->rect, playButtonBG->rect);
-				moveRectToRect(skinsText->rect, skinsButtonBG->rect);
-				moveRectToRect(optionsText->rect, optionsButtonBG->rect);
-				moveRectToRect(quitText->rect, quitButtonBG->rect);
+				moveAssetToAsset(playText, playButtonBG);
+				moveAssetToAsset(skinsText, skinsButtonBG);
+				moveAssetToAsset(optionsText, optionsButtonBG);
+				moveAssetToAsset(quitText, quitButtonBG);
 
 				selected = NONE;
 				highlighted = NONE;
@@ -194,13 +194,13 @@ int main(void)
 			}
 
 			/* Determine selected button */
-			if (mouseOverRect(playButtonBG->rect, mouseX, mouseY)) {
+			if (mouseOverAsset(playButtonBG, mouseX, mouseY)) {
 				selected = PLAY;
-			} else if (mouseOverRect(skinsButtonBG->rect, mouseX, mouseY)) {
+			} else if (mouseOverAsset(skinsButtonBG, mouseX, mouseY)) {
 				selected = SKINS;
-			} else if (mouseOverRect(optionsButtonBG->rect, mouseX, mouseY)) {
+			} else if (mouseOverAsset(optionsButtonBG, mouseX, mouseY)) {
 				selected = OPTIONS;
-			} else if (mouseOverRect(quitButtonBG->rect, mouseX, mouseY)) {
+			} else if (mouseOverAsset(quitButtonBG, mouseX, mouseY)) {
 				selected = QUIT;
 			} else if (up || down) {
 				switch (selected) {
@@ -245,16 +245,16 @@ int main(void)
 				/* Remove current highlight */
 				switch (highlighted) {
 				case PLAY:
-					undoHighlightRect(playButtonBG->rect);
+					undoHighlightAsset(playButtonBG);
 					break;
 				case SKINS:
-					undoHighlightRect(skinsButtonBG->rect);
+					undoHighlightAsset(skinsButtonBG);
 					break;
 				case OPTIONS:
-					undoHighlightRect(optionsButtonBG->rect);
+					undoHighlightAsset(optionsButtonBG);
 					break;
 				case QUIT:
-					undoHighlightRect(quitButtonBG->rect);
+					undoHighlightAsset(quitButtonBG);
 					break;
 				default:
 					break;
@@ -263,19 +263,19 @@ int main(void)
 				/* Highlight selected button */
 				switch (selected) {
 				case PLAY:
-					doHighlightRect(playButtonBG->rect);
+					doHighlightAsset(playButtonBG);
 					highlighted = PLAY;
 					break;
 				case SKINS:
-					doHighlightRect(skinsButtonBG->rect);
+					doHighlightAsset(skinsButtonBG);
 					highlighted = SKINS;
 					break;
 				case OPTIONS:
-					doHighlightRect(optionsButtonBG->rect);
+					doHighlightAsset(optionsButtonBG);
 					highlighted = OPTIONS;
 					break;
 				case QUIT:
-					doHighlightRect(quitButtonBG->rect);
+					doHighlightAsset(quitButtonBG);
 					highlighted = QUIT;
 					break;
 				default:
@@ -286,28 +286,28 @@ int main(void)
 			/* Change current menu if button is pressed */
 			switch (selected) {
 			case PLAY:
-				if (enter || (mouseOverRect(playButtonBG->rect, mouseX, mouseY) && leftClick)) {
+				if (enter || (mouseOverAsset(playButtonBG, mouseX, mouseY) && leftClick)) {
 					menu = PLAY_MENU;
 					clearAssetData(assets);
 					loaded = 0;
 				}
 				break;
 			case SKINS:
-				if (enter || (mouseOverRect(skinsButtonBG->rect, mouseX, mouseY) && leftClick)) {
+				if (enter || (mouseOverAsset(skinsButtonBG, mouseX, mouseY) && leftClick)) {
 					menu = SKINS_MENU;
 					clearAssetData(assets);
 					loaded = 0;
 				}
 				break;
 			case OPTIONS:
-				if (enter || (mouseOverRect(optionsButtonBG->rect, mouseX, mouseY) && leftClick)) {
+				if (enter || (mouseOverAsset(optionsButtonBG, mouseX, mouseY) && leftClick)) {
 					menu = OPTIONS_MENU;
 					clearAssetData(assets);
 					loaded = 0;
 				}
 				break;
 			case QUIT:
-				if (enter || (mouseOverRect(quitButtonBG->rect, mouseX, mouseY) && leftClick))
+				if (enter || (mouseOverAsset(quitButtonBG, mouseX, mouseY) && leftClick))
 					quit = 1;
 				break;
 			default:
@@ -353,29 +353,29 @@ int main(void)
 				if (!backArrow)
 					return raiseError(error, assets);
 
-				scaleRect(skinsTitle->rect, 2);
-				centerXRect(skinsTitle->rect);
-				setYRect(skinsTitle->rect, (skinsTitle->rect)->h / 4);
+				scaleAsset(skinsTitle, 2);
+				centerXAsset(skinsTitle);
+				setYAsset(skinsTitle, (skinsTitle->rect)->h / 4);
 
-				scaleRect(frame->rect, 5);
-				centerRect(frame->rect);
+				scaleAsset(frame, 5);
+				centerAsset(frame);
 
-				scaleRect(leftArrow->rect, 2);
-				centerYRect(leftArrow->rect);
-				setXPropRect(leftArrow->rect, 0.34);
+				scaleAsset(leftArrow, 2);
+				centerYAsset(leftArrow);
+				setXPropAsset(leftArrow, 0.34);
 
-				scaleRect(rightArrow->rect, 2);
-				centerYRect(rightArrow->rect);
-				setXPropRect(rightArrow->rect, 0.66);
+				scaleAsset(rightArrow, 2);
+				centerYAsset(rightArrow);
+				setXPropAsset(rightArrow, 0.66);
 
-				scaleRect(equipButtonBG->rect, 0.75);
-				centerRect(equipButtonBG->rect);
-				setYPropRect(equipButtonBG->rect, 0.9);
+				scaleAsset(equipButtonBG, 0.75);
+				centerAsset(equipButtonBG);
+				setYPropAsset(equipButtonBG, 0.9);
 
-				moveRectToRect(equipText->rect, equipButtonBG->rect);
+				moveAssetToAsset(equipText, equipButtonBG);
 
-				scaleRect(backArrow->rect, 2);
-				setRect(backArrow->rect, (backArrow->rect)->w / 2, (backArrow->rect)->h / 2);
+				scaleAsset(backArrow, 2);
+				setAsset(backArrow, (backArrow->rect)->w / 2, (backArrow->rect)->h / 2);
 
 				selected = NONE;
 				highlighted = NONE;
@@ -384,25 +384,25 @@ int main(void)
 			}
 
 			/* Highlight button under cursor */
-			if (mouseOverRect(equipButtonBG->rect, mouseX, mouseY))
+			if (mouseOverAsset(equipButtonBG, mouseX, mouseY))
 				selected = EQUIP;
 			else
 				selected = NONE;
 
 			if (highlighted != selected) {
 				if (highlighted == EQUIP) {
-					undoHighlightRect(equipButtonBG->rect);
+					undoHighlightAsset(equipButtonBG);
 					highlighted = NONE;
 				}
 
 				if (selected == EQUIP) {
-					doHighlightRect(equipButtonBG->rect);
+					doHighlightAsset(equipButtonBG);
 					highlighted = EQUIP;
 				}
 			}
 
 			/* Go back to main menu if vack arrow is pressed */
-			if (mouseOverRect(backArrow->rect, mouseX, mouseY) && leftClick) {
+			if (mouseOverAsset(backArrow, mouseX, mouseY) && leftClick) {
 				menu = MAIN_MENU;
 				clearAssetData(assets);
 				loaded = 0;
