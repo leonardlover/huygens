@@ -105,17 +105,15 @@ void clearAssetData(struct GameAssets *assets)
 		_destroyAsset(assets->assetData[i]);
 
 	assets->count = 0;
-
-	free(assets->assetData);
-
-	assets->buffer = 0;
 }
 
 
 void killGame(struct GameAssets *assets)
 {
-	if(assets->assetData)
+	if(assets->assetData) {
 		clearAssetData(assets);
+		free(assets->assetData);
+	}
 
 	if (assets->renderer)
 		SDL_DestroyRenderer(assets->renderer);
