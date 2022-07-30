@@ -35,12 +35,14 @@ int main(void)
 	int loaded = 0;
 	int mouseX, mouseY;
 	int leftClick = 0;
+	int up, down, left, right, enter;
 
 	int begin;
 	int elapsed;
 
 	enum Menu menu = MAIN_MENU;
-	enum HighlightedButton hltd;
+	enum Button selected;
+	enum Button highlighted;
 
 	SDL_Event event;
 
@@ -70,6 +72,14 @@ int main(void)
 		/* Save time when loop began so it can be considered when doing SDL_Delay */
 		begin = SDL_GetTicks();
 
+		/* Reset input flags */
+		up = 0;
+		down = 0;
+		left = 0;
+		right = 0;
+		enter = 0;
+		leftClick = 0;
+
 		/* Manage input */
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
@@ -80,9 +90,26 @@ int main(void)
 				if (event.button.button == SDL_BUTTON_LEFT)
 					leftClick = 1;
 				break;
-			case SDL_MOUSEBUTTONUP:
-				if (leftClick)
-					leftClick = 0;
+			case SDL_KEYDOWN:
+				switch (event.key.keysym.scancode) {
+				case SDL_SCANCODE_UP:
+					up = 1;
+					break;
+				case SDL_SCANCODE_DOWN:
+					down = 1;
+					break;
+				case SDL_SCANCODE_LEFT:
+					left = 1;
+					break;
+				case SDL_SCANCODE_RIGHT:
+					right = 1;
+					break;
+				case SDL_SCANCODE_RETURN:
+					enter = 1;
+					break;
+				default:
+					break;
+				}
 			default:
 				break;
 			}
@@ -160,73 +187,132 @@ int main(void)
 				moveRectToRect(optionsText->rect, optionsButtonBG->rect);
 				moveRectToRect(quitText->rect, quitButtonBG->rect);
 
-				hltd = NONE;
+				selected = NONE;
+				highlighted = NONE;
 
 				loaded = 1;
 			}
 
-			/* Highlight button under cursor */
-			switch (hltd) {
-			case NONE:
-				if (mouseOverRect(playButtonBG->rect, mouseX, mouseY)) {
-					doHighlightRect(playButtonBG->rect);
-					hltd = PLAY;
-				} else if (mouseOverRect(skinsButtonBG->rect, mouseX, mouseY)) {
-					doHighlightRect(skinsButtonBG->rect);
-					hltd = SKINS;
-				} else if (mouseOverRect(optionsButtonBG->rect, mouseX, mouseY)) {
-					doHighlightRect(optionsButtonBG->rect);
-					hltd = OPTIONS;
-				} else if (mouseOverRect(quitButtonBG->rect, mouseX, mouseY)) {
-					doHighlightRect(quitButtonBG->rect);
-					hltd = QUIT;
+			/* Determine selected button */
+			if (mouseOverRect(playButtonBG->rect, mouseX, mouseY)) {
+				selected = PLAY;
+			} else if (mouseOverRect(skinsButtonBG->rect, mouseX, mouseY)) {
+				selected = SKINS;
+			} else if (mouseOverRect(optionsButtonBG->rect, mouseX, mouseY)) {
+				selected = OPTIONS;
+			} else if (mouseOverRect(quitButtonBG->rect, mouseX, mouseY)) {
+				selected = QUIT;
+			} else if (up || down) {
+				switch (selected) {
+				case PLAY:
+					selected = OPTIONS;
+					break;
+				case SKINS:
+					selected = QUIT;
+					break;
+				case OPTIONS:
+				case NONE:
+					selected = PLAY;
+					break;
+				case QUIT:
+					selected = SKINS;
+					break;
+				default:
+					break;
 				}
-				break;
-			case PLAY:
-				if (!mouseOverRect(playButtonBG->rect, mouseX, mouseY)) {
+			} else if (left || right) {
+				switch (selected) {
+				case PLAY:
+					selected = SKINS;
+					break;
+				case SKINS:
+				case NONE:
+					selected = PLAY;
+					break;
+				case OPTIONS:
+					selected = QUIT;
+					break;
+				case QUIT:
+					selected = OPTIONS;
+					break;
+				default:
+					break;
+				}
+			}
+
+			/* Highlight selected button if not already highlighted */
+			if (highlighted != selected) {
+				/* Remove current highlight */
+				switch (highlighted) {
+				case PLAY:
 					undoHighlightRect(playButtonBG->rect);
-					hltd = NONE;
-				}
-				break;
-			case SKINS:
-				if (!mouseOverRect(skinsButtonBG->rect, mouseX, mouseY)) {
+					break;
+				case SKINS:
 					undoHighlightRect(skinsButtonBG->rect);
-					hltd = NONE;
-				}
-				break;
-			case OPTIONS:
-				if (!mouseOverRect(optionsButtonBG->rect, mouseX, mouseY)) {
+					break;
+				case OPTIONS:
 					undoHighlightRect(optionsButtonBG->rect);
-					hltd = NONE;
-				}
-				break;
-			case QUIT:
-				if (!mouseOverRect(quitButtonBG->rect, mouseX, mouseY)) {
+					break;
+				case QUIT:
 					undoHighlightRect(quitButtonBG->rect);
-					hltd = NONE;
+					break;
+				default:
+					break;
 				}
-			default:
-				break;
+
+				/* Highlight selected button */
+				switch (selected) {
+				case PLAY:
+					doHighlightRect(playButtonBG->rect);
+					highlighted = PLAY;
+					break;
+				case SKINS:
+					doHighlightRect(skinsButtonBG->rect);
+					highlighted = SKINS;
+					break;
+				case OPTIONS:
+					doHighlightRect(optionsButtonBG->rect);
+					highlighted = OPTIONS;
+					break;
+				case QUIT:
+					doHighlightRect(quitButtonBG->rect);
+					highlighted = QUIT;
+					break;
+				default:
+					break;
+				}
 			}
 
 			/* Change current menu if button is pressed */
-			if (hltd == PLAY && leftClick) {
-				menu = PLAY_MENU;
-				clearAssetData(assets);
-				loaded = 0;
+			switch (selected) {
+			case PLAY:
+				if (enter || (mouseOverRect(playButtonBG->rect, mouseX, mouseY) && leftClick)) {
+					menu = PLAY_MENU;
+					clearAssetData(assets);
+					loaded = 0;
+				}
+				break;
+			case SKINS:
+				if (enter || (mouseOverRect(skinsButtonBG->rect, mouseX, mouseY) && leftClick)) {
+					menu = SKINS_MENU;
+					clearAssetData(assets);
+					loaded = 0;
+				}
+				break;
+			case OPTIONS:
+				if (enter || (mouseOverRect(optionsButtonBG->rect, mouseX, mouseY) && leftClick)) {
+					menu = OPTIONS_MENU;
+					clearAssetData(assets);
+					loaded = 0;
+				}
+				break;
+			case QUIT:
+				if (enter || (mouseOverRect(quitButtonBG->rect, mouseX, mouseY) && leftClick))
+					quit = 1;
+				break;
+			default:
+				break;
 			}
-			if (hltd == SKINS && leftClick) {
-				menu = SKINS_MENU;
-				clearAssetData(assets);
-				loaded = 0;
-			}
-			if (hltd == OPTIONS && leftClick) {
-				menu = OPTIONS_MENU;
-				clearAssetData(assets);
-				loaded = 0;
-			}
-			if (hltd == QUIT && leftClick)
-				quit = 1;
 
 			/* Render menu */
 			renderAssetData(assets);
@@ -291,24 +377,25 @@ int main(void)
 				scaleRect(backArrow->rect, 2);
 				setRect(backArrow->rect, (backArrow->rect)->w / 2, (backArrow->rect)->h / 2);
 
-				hltd = NONE;
+				highlighted = NONE;
 
 				loaded = 1;
 			}
 
 			/* Highlight button under cursor */
-			switch (hltd) {
+			switch (highlighted) {
 			case NONE:
 				if (mouseOverRect(equipButtonBG->rect, mouseX, mouseY)) {
 					doHighlightRect(equipButtonBG->rect);
-					hltd = EQUIP;
+					highlighted = EQUIP;
 				}
 				break;
 			case EQUIP:
 				if (!mouseOverRect(equipButtonBG->rect, mouseX, mouseY)) {
 					undoHighlightRect(equipButtonBG->rect);
-					hltd = NONE;
+					highlighted = NONE;
 				}
+				break;
 			default:
 				break;
 			}
@@ -324,6 +411,7 @@ int main(void)
 			renderAssetData(assets);
 			break;
 		case OPTIONS_MENU:
+			break;
 		default:
 			break;
 		}
