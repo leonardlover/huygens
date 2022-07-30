@@ -5,14 +5,6 @@
 #include "utils.h"
 
 
-enum Menu {
-	MAIN_MENU,
-	PLAY_MENU,
-	SKINS_MENU,
-	OPTIONS_MENU,
-};
-
-
 enum Button {
 	NONE,
 	PLAY,
@@ -21,6 +13,26 @@ enum Button {
 	QUIT,
 	EQUIP,
 };
+
+enum Menu {
+	MAIN_MENU,
+	PLAY_MENU,
+	SKINS_MENU,
+	OPTIONS_MENU,
+};
+
+
+enum Skin {
+	BALLOON,
+	BUBBLE,
+	CLOUD,
+	FLY,
+	MATRIX,
+	NYAN,
+	SHEEP,
+	SUPER,
+	TAILS,
+}
 
 
 #endif
