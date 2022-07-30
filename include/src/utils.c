@@ -192,7 +192,7 @@ struct Asset *loadAsset(char *path, struct GameAssets *assets, enum ErrorType *e
 	asset->texture = tex;
 	asset->rect = rect;
 
-	if (assets->count == 0) {
+	if (assets->buffer == 0) {
 		assets->assetData = malloc(sizeof(struct Asset *));
 
 		if (!assets->assetData) {
@@ -202,17 +202,18 @@ struct Asset *loadAsset(char *path, struct GameAssets *assets, enum ErrorType *e
 		}
 
 		assets->buffer = 1;
-	} else {
-		if (assets->count == assets->buffer) {
-			assets->buffer *= 2;
-			assets->assetData = realloc(assets->assetData, assets->buffer * sizeof(struct Asset *));
+	} else if (assets->count == assets->buffer) {
+		assets->buffer *= 2;
+		struct Asset **reallocatedAssetData = realloc(assets->assetData,
+							      assets->buffer * sizeof(struct Asset *));
 
-			if (!assets->assetData) {
-				clearAssetData(assets);
-				*error = MEMORY;
-				return NULL;
-			}
+		if (!reallocatedAssetData) {
+			clearAssetData(assets);
+			*error = MEMORY;
+			return NULL;
 		}
+
+		assets->assetData = reallocatedAssetData;
 	}
 		
 	assets->assetData[assets->count] = asset;
