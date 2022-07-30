@@ -377,27 +377,28 @@ int main(void)
 				scaleRect(backArrow->rect, 2);
 				setRect(backArrow->rect, (backArrow->rect)->w / 2, (backArrow->rect)->h / 2);
 
+				selected = NONE;
 				highlighted = NONE;
 
 				loaded = 1;
 			}
 
 			/* Highlight button under cursor */
-			switch (highlighted) {
-			case NONE:
-				if (mouseOverRect(equipButtonBG->rect, mouseX, mouseY)) {
-					doHighlightRect(equipButtonBG->rect);
-					highlighted = EQUIP;
-				}
-				break;
-			case EQUIP:
-				if (!mouseOverRect(equipButtonBG->rect, mouseX, mouseY)) {
+			if (mouseOverRect(equipButtonBG->rect, mouseX, mouseY))
+				selected = EQUIP;
+			else
+				selected = NONE;
+
+			if (highlighted != selected) {
+				if (highlighted == EQUIP) {
 					undoHighlightRect(equipButtonBG->rect);
 					highlighted = NONE;
 				}
-				break;
-			default:
-				break;
+
+				if (selected == EQUIP) {
+					doHighlightRect(equipButtonBG->rect);
+					highlighted = EQUIP;
+				}
 			}
 
 			/* Go back to main menu if vack arrow is pressed */
