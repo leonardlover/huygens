@@ -1,19 +1,39 @@
 CC := gcc
+INCLUDEDIR := include
+OBJSRCDIR := include/src
 CFLAGS := -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lm
 SRC := huygens.c
-OBJ := $(SRC:.c=.o)
-EXE := huygens
+EXE := Huygens.exe
 
-all: $(EXE) clean
+all: $(EXE) clean run
 
-$(EXE): $(OBJ)
-	@$(CC) $^ -o $@ $(CFLAGS)
+$(INCLUDEDIR)/utils.ghc:
+	@echo "Compiling..."
+	@$(CC) $(@:.ghc=.h)
 
-$(OBJ): $(SRC)
-	@$(CC) -c $(SRC)
+utils.o: $(INCLUDEDIR)/utils.ghc
+	@$(CC) -c $(OBJSRCDIR)/$(@:.o=.c) -I$(INCLUDEDIR)
+
+$(INCLUDEDIR)/rect_utils.ghc:
+	@$(CC) $(@:.ghc=.h)
+
+rect_utils.o: $(INCLUDEDIR)/rect_utils.ghc
+	@$(CC) -c $(OBJSRCDIR)/$(@:.o=.c) -I$(INCLUDEDIR)
+
+$(INCLUDEDIR)/menu_utils.ghc:
+	@$(CC) $(@:.ghc=.h)
+
+menu_utils.o: $(INCLUDEDIR)/menu_utils.ghc
+	@$(CC) -c $(OBJSRCDIR)/$(@:.o=.c) -I$(INCLUDEDIR)
+
+$(EXE): utils.o rect_utils.o menu_utils.o
+	@$(CC) $(SRC) -o $@ $^ -I$(INCLUDEDIR) $(CFLAGS)
 
 .PHONY: clean
 clean:
-	@rm $(OBJ)
-	@./$(EXE)
-	@rm $(EXE)
+	@rm $(INCLUDEDIR)/*.gch
+	@rm *.o
+
+.PHONY: run
+run:
+	./$(EXE)
