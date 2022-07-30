@@ -19,6 +19,7 @@ enum HighlightedButton {
 	SKINS,
 	OPTIONS,
 	QUIT,
+	EQUIP,
 };
 
 
