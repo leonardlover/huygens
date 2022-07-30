@@ -51,7 +51,7 @@ void shiftRect(SDL_Rect *rect, int x, int y);
 void moveRectToRect(SDL_Rect *src, SDL_Rect *tgt);
 
 
-int mouseOverRect(SDL_Rect rect, int x, int y);
+int mouseOverRect(SDL_Rect *rect, int x, int y);
 
 
 void _highlightRect(SDL_Rect *rect, float factor);

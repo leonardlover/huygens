@@ -22,7 +22,4 @@ enum HighlightedButton {
 };
 
 
-int loadMainMenuAssets(struct GameAssets *assets, enum ErrorType *error);
-
-
 #endif

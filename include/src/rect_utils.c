@@ -119,10 +119,10 @@ void moveRectToRect(SDL_Rect *src, SDL_Rect *tgt)
 }
 
 
-int mouseOverRect(SDL_Rect rect, int x, int y)
+int mouseOverRect(SDL_Rect *rect, int x, int y)
 {
-	if (rect.x <= x && x <= rect.x + rect.w &&
-	    rect.y <= y && y <= rect.y + rect.h)
+	if (rect->x <= x && x <= rect->x + rect->w &&
+	    rect->y <= y && y <= rect->y + rect->h)
 			return 1;
 
 	return 0;
@@ -136,7 +136,7 @@ void _highlightRect(SDL_Rect *rect, float factor)
 	w = rect->w;
 	h = rect->h;
 
-	scaleRect(rect, HLFACTOR);
+	scaleRect(rect, factor);
 
 	shiftRect(rect, (w - rect->w) / 2, (h - rect->h) / 2);
 }
