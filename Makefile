@@ -36,4 +36,5 @@ clean:
 
 .PHONY: run
 run:
-	./$(EXE)
+	@echo "Running..."
+	@./$(EXE)
