@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+#include <time.h>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -17,6 +19,9 @@
 
 int main(void)
 {
+	/* Set up random seed */
+	srand(time(NULL));
+
 	/* Error handling flag */
 	enum ErrorType *error;
 
@@ -61,6 +66,7 @@ int main(void)
 	struct Asset *quitText = NULL;
 
 	/* Set up play menu variables */
+	enum Skin selectedSkin = SHEEP;
 
 	/* Set up skins menu variables */
 	struct Asset *skinsMenuBG = NULL;
@@ -78,7 +84,6 @@ int main(void)
 
 	int loadedSkin = 0;
 	enum Skin skin;
-	enum Skin selectedSkin = SHEEP;
 
 	while (!quit) {
 		/* Save time when loop began so it can be considered when doing SDL_Delay */
