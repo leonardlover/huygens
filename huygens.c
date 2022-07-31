@@ -10,6 +10,8 @@
 #include "asset_utils.h"
 #include "menu_utils.h"
 
+#define WIDTH 1280
+#define HEIGHT 720
 #define FPS 60
 #define DELAY 1000 / FPS
 
@@ -58,6 +60,8 @@ int main(void)
 	struct Asset *optionsText = NULL;
 	struct Asset *quitText = NULL;
 
+	/* Set up play menu variables */
+
 	/* Set up skins menu variables */
 	struct Asset *skinsMenuBG = NULL;
 	struct Asset *skinsTitle = NULL;
@@ -67,6 +71,14 @@ int main(void)
 	struct Asset *equipButtonBG = NULL;
 	struct Asset *equipText = NULL;
 	struct Asset *backArrow = NULL;
+
+	char *skinPath = NULL;
+	SDL_Texture *skinTexture = NULL;
+	SDL_Rect skinRect;
+
+	int loadedSkin = 0;
+	enum Skin skin;
+	enum Skin selectedSkin = SHEEP;
 
 	while (!quit) {
 		/* Save time when loop began so it can be considered when doing SDL_Delay */
@@ -283,6 +295,9 @@ int main(void)
 				}
 			}
 
+			/* Render menu */
+			renderAssetData(assets, 1);
+
 			/* Change current menu if button is pressed */
 			switch (selected) {
 			case PLAY:
@@ -314,12 +329,11 @@ int main(void)
 				break;
 			}
 
-			/* Render menu */
-			renderAssetData(assets);
 			break;
 		case PLAY_MENU:
 			break;
 		case SKINS_MENU:
+			/* Load assets if not loaded */
 			if (!loaded) {
 				skinsMenuBG = loadAsset("media/img/bg.png", assets, error);
 				if (!skinsMenuBG)
@@ -380,7 +394,64 @@ int main(void)
 				selected = NONE;
 				highlighted = NONE;
 
+				skin = selectedSkin;
+
 				loaded = 1;
+			}
+
+			/* Load skin if not loaded */
+			if (!loadedSkin) {
+				switch (skin) {
+				case SHEEP:
+					skinPath = "media/img/skins/sheep.png";
+					break;
+				case BALLOON:
+					skinPath = "media/img/skins/balloon.png";
+					break;
+				case BUBBLE:
+					skinPath = "media/img/skins/bubble.png";
+					break;
+				case CLOUD:
+					skinPath = "media/img/skins/cloud.png";
+					break;
+				case FLY:
+					skinPath = "media/img/skins/fly.png";
+					break;
+				case MATRIX:
+					skinPath = "media/img/skins/matrix.png";
+					break;
+				case NYAN:
+					skinPath = "media/img/skins/nyan.png";
+					break;
+				case SUPER:
+					skinPath = "media/img/skins/super.png";
+					break;
+				case TAILS:
+					skinPath = "media/img/skins/tails.png";
+					break;
+				default:
+					break;
+				}
+
+				skinTexture = _loadTexture(skinPath, assets, error);
+
+				if (!skinTexture) {
+					SDL_DestroyTexture(skinTexture);
+					return raiseError(error, assets);
+				}
+
+				if (SDL_QueryTexture(skinTexture, NULL, NULL, &skinRect.w, &skinRect.h) != 0) {
+					SDL_DestroyTexture(skinTexture);
+					*error = MEMORY;
+					return raiseError(error, assets);
+				}
+
+				skinRect.w *= 4;
+				skinRect.h *= 4;
+				skinRect.x = (WIDTH - skinRect.w) / 2;
+				skinRect.y = (HEIGHT - skinRect.h) / 2;
+
+				loadedSkin = 1;
 			}
 
 			/* Highlight button under cursor */
@@ -401,15 +472,40 @@ int main(void)
 				}
 			}
 
-			/* Go back to main menu if vack arrow is pressed */
-			if (mouseOverAsset(backArrow, mouseX, mouseY) && leftClick) {
-				menu = MAIN_MENU;
-				clearAssetData(assets);
-				loaded = 0;
+			if (enter || (mouseOverAsset(equipButtonBG, mouseX, mouseY) && leftClick))
+				selectedSkin = skin;
+
+			/* Change skin if arrow is pressed */
+			if (right || (mouseOverAsset(rightArrow, mouseX, mouseY) && leftClick)) {
+				skin = (skin + 1) % 9;
+				SDL_DestroyTexture(skinTexture);
+				loadedSkin = 0;
+			}
+			if (left || (mouseOverAsset(leftArrow, mouseX, mouseY) && leftClick)) {
+				if (skin == SHEEP)
+					skin = TAILS;
+				else
+					skin = (skin - 1) % 9;
+
+				SDL_DestroyTexture(skinTexture);
+				loadedSkin = 0;
 			}
 
 			/* Render menu */
-			renderAssetData(assets);
+			renderAssetData(assets, 0);
+
+			/* Render skin */
+			SDL_RenderCopy(assets->renderer, skinTexture, NULL, &skinRect);
+			SDL_RenderPresent(assets->renderer);
+
+			/* Go back to main menu if back arrow is pressed */
+			if (mouseOverAsset(backArrow, mouseX, mouseY) && leftClick) {
+				menu = MAIN_MENU;
+				SDL_DestroyTexture(skinTexture);
+				loadedSkin = 0;
+				clearAssetData(assets);
+				loaded = 0;
+			}
 			break;
 		case OPTIONS_MENU:
 			break;
@@ -422,6 +518,9 @@ int main(void)
 		if (elapsed < DELAY)
 			SDL_Delay(DELAY - elapsed);
 	}
+
+	if(skinTexture)
+		SDL_DestroyTexture(skinTexture);
 
 	killGame(assets);
 
