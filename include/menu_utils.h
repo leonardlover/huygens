@@ -2,9 +2,6 @@
 #define MENU_UTILS_H
 
 
-#include "utils.h"
-
-
 enum Button {
 	NONE,
 	PLAY,
@@ -23,16 +20,16 @@ enum Menu {
 
 
 enum Skin {
+	SHEEP,
 	BALLOON,
 	BUBBLE,
 	CLOUD,
 	FLY,
 	MATRIX,
 	NYAN,
-	SHEEP,
 	SUPER,
 	TAILS,
-}
+};
 
 
 #endif

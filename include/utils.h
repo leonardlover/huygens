@@ -57,7 +57,7 @@ SDL_Texture *_loadTexture(char *path, struct GameAssets *assets, enum ErrorType 
 struct Asset *loadAsset(char *path, struct GameAssets *assets, enum ErrorType *error);
 
 
-void renderAssetData(struct GameAssets *assets);
+void renderAssetData(struct GameAssets *assets, int present);
 
 
 #endif

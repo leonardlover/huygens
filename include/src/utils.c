@@ -224,7 +224,7 @@ struct Asset *loadAsset(char *path, struct GameAssets *assets, enum ErrorType *e
 }
 
 
-void renderAssetData(struct GameAssets *assets)
+void renderAssetData(struct GameAssets *assets, int present)
 {
 	if (assets->assetData) {
 		SDL_RenderClear(assets->renderer);
@@ -235,7 +235,8 @@ void renderAssetData(struct GameAssets *assets)
 				       NULL,
 				       (assets->assetData[i])->rect);
 
-		SDL_RenderPresent(assets->renderer);
+		if (present)
+			SDL_RenderPresent(assets->renderer);
 	}
 }
 
