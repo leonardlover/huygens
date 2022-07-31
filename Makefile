@@ -1,7 +1,7 @@
 CC := gcc
 INCLUDEDIR := include
 OBJSRCDIR := include/src
-CFLAGS := -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lm
+CFLAGS := -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lm -g
 SRC := huygens.c
 EXE := Huygens.exe
 
@@ -25,3 +25,4 @@ clean:
 run:
 	@echo "Running..."
 	@./$(EXE)
+	@echo "Exiting..."
