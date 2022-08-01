@@ -1,3 +1,6 @@
+/* Credits to https://www.fesliyanstudios.com *
+ * for the background music.                  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -59,6 +62,13 @@ int main(void)
 		return 1;
 	}
 
+	Mix_Music *gameMusic = Mix_LoadMUS("media/audio/gameMusic.mp3");
+	if (!gameMusic) {
+		*error = MUSIC;
+		printError(error);
+		return 1;
+	}
+
 	/* Create game assets, a manager for game data */
 	struct GameAssets *assets = createGameAssets("Go! Sheep Dog!", error);
 	if (!assets)
@@ -114,12 +124,13 @@ int main(void)
 	int loadedSkin = 0;
 	enum Skin skin;
 
-	if (!Mix_PlayingMusic())
-		Mix_PlayMusic(menuMusic, -1);
-
 	while (!quit) {
 		/* Save time when loop began so it can be considered when doing SDL_Delay */
 		begin = SDL_GetTicks();
+
+		/* Reproduce music if not already playing */
+		if (!Mix_PlayingMusic())
+			Mix_PlayMusic(menuMusic, -1);
 
 		/* Reset input flags */
 		up = 0;
@@ -558,8 +569,14 @@ int main(void)
 	if(skinTexture)
 		SDL_DestroyTexture(skinTexture);
 
+	if (Mix_PlayingMusic())
+		Mix_HaltMusic();
+
 	if (menu == PLAY_MENU) {
 		int quitGame = 0;
+
+		if (!Mix_PlayingMusic())
+			Mix_PlayMusic(gameMusic, -1);
 		
 		switch (selectedSkin) {
 		case SHEEP:
@@ -1336,6 +1353,9 @@ int main(void)
 		if (standaloneSkin)
 			SDL_DestroyTexture(standaloneSkin);
 	}
+
+	if (Mix_PlayingMusic())
+		Mix_HaltMusic();
 
 	Mix_FreeMusic(menuMusic);
 	Mix_Quit();
