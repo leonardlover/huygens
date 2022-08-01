@@ -5,7 +5,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-//#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_mixer.h>
 
 #include "utils.h"
 #include "asset_utils.h"
@@ -42,6 +42,19 @@ int main(void)
 	/* Initialize SDL */
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		*error = INITIALIZATION;	
+		printError(error);
+		return 1;
+	}
+
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) != 0) {
+		*error = MUSIC;
+		printError(error);
+		return 1;
+	}
+
+	Mix_Music *menuMusic = Mix_LoadMUS("media/audio/menuMusic.mp3");
+	if (!menuMusic) {
+		*error = MUSIC;
 		printError(error);
 		return 1;
 	}
@@ -100,6 +113,9 @@ int main(void)
 
 	int loadedSkin = 0;
 	enum Skin skin;
+
+	if (!Mix_PlayingMusic())
+		Mix_PlayMusic(menuMusic, -1);
 
 	while (!quit) {
 		/* Save time when loop began so it can be considered when doing SDL_Delay */
@@ -1321,6 +1337,8 @@ int main(void)
 			SDL_DestroyTexture(standaloneSkin);
 	}
 
+	Mix_FreeMusic(menuMusic);
+	Mix_Quit();
 	killGame(assets);
 
 	return 0;

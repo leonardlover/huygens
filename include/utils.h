@@ -24,6 +24,7 @@ struct GameAssets {
 
 enum ErrorType {
 	INITIALIZATION,
+	MUSIC,
 	MEMORY,
 	WINDOW,
 	RENDERER,

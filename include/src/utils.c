@@ -8,6 +8,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 
 
 #include "utils.h"
@@ -31,6 +32,9 @@ void printError(enum ErrorType *error)
 	case INITIALIZATION:
 		errorMsg = "Initialization";
 		break;
+	case MUSIC:
+		errorMsg = "Music";
+		break;
 	case MEMORY:
 		errorMsg = "Memory";
 		break;
@@ -53,7 +57,10 @@ void printError(enum ErrorType *error)
 		break;
 	}
 
-	printf("%s error: %s\n", errorMsg, SDL_GetError());
+	if (*error == MUSIC)
+		printf("%s error: %s\n", errorMsg, Mix_GetError());
+	else
+		printf("%s error: %s\n", errorMsg, SDL_GetError());
 }
 
 
