@@ -10,12 +10,12 @@
 
 
 #ifndef WIDTH
-#define WIDTH 1280
+#define WIDTH 1260
 #endif
 
 
 #ifndef HEIGHT
-#define HEIGHT 720
+#define HEIGHT 700
 #endif
 
 
