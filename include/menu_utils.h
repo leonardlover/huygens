@@ -6,7 +6,7 @@ enum Button {
 	NONE,
 	PLAY,
 	SKINS,
-	OPTIONS,
+	//OPTIONS,
 	QUIT,
 	EQUIP,
 };
@@ -15,7 +15,7 @@ enum Menu {
 	MAIN_MENU,
 	PLAY_MENU,
 	SKINS_MENU,
-	OPTIONS_MENU,
+	//OPTIONS_MENU,
 };
 
 
@@ -23,7 +23,7 @@ enum Skin {
 	SHEEP,
 	BALLOON,
 	BUBBLE,
-	CLOUD,
+	//CLOUD,
 	FLY,
 	MATRIX,
 	NYAN,
