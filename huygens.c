@@ -5,7 +5,6 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-//#include <SDL2/SDL_ttf.h>
 //#include <SDL2/SDL_mixer.h>
 
 #include "utils.h"
@@ -665,6 +664,14 @@ int main(void)
 		for (int i = 0; i < 4; i++)
 			SDL_QueryTexture(spriteNum[i], NULL, NULL, &textureNumber[i].w,&textureNumber[i].h);
 
+		/* INICIALIZAR CON LOS VALORES CORRECTOS */
+		SDL_Rect numberHS[4] = {{705,290,40,60},{660,290,40,60},{615,290,40,60},{570,290,40,60}};
+
+		SDL_Rect textureNumberHS[4] = {{1,1,40,60},{1,1,40,60},{1,1,40,60},{1,1,40,60}};
+		
+		for (int i = 0; i < 4; i++)
+			SDL_QueryTexture(spriteNum[i], NULL, NULL, &textureNumberHS[i].w,&textureNumberHS[i].h);
+
 		SDL_Texture *spriteScore = NULL;
 		SDL_Surface *tempScore = IMG_Load("media/img/Score.png");
 		spriteScore = SDL_CreateTextureFromSurface(assets->renderer, tempScore);
@@ -811,7 +818,7 @@ int main(void)
 		float textMove = 5;
 		char xMove = 3;
 		unsigned long int count = 0; 
-		unsigned int points = 0;
+		unsigned int points = 0, highscore = 0;
 		char stop = 0, space = 0, cloudsMove = 1, campMove = 10;
 		char fase = 0, pause = 0, index = 0, endIndex = 0, reset = 2;
 
@@ -820,6 +827,10 @@ int main(void)
 			textureNumber[i].y = 1;
 			textureNumber[i].w = 40;
 			textureNumber[i].h = 60;
+			textureNumberHS[i].x = 1;
+			textureNumberHS[i].y = 1;
+			textureNumberHS[i].w = 40;
+			textureNumberHS[i].h = 60;
 		}
 
 		textureTransicion.x = 0;
@@ -870,6 +881,8 @@ int main(void)
 
 		SDL_Texture *standaloneSkin = _loadTexture(skinPath, assets, error);
 		SDL_QueryTexture(standaloneSkin, NULL, NULL, &textureRect.w, &textureRect.h);
+
+		FILE *highScoreFile = NULL;
 
 		SDL_Event e; //aqui se guarda el "evento", un click o pulsar una tecla.
 		while (!quitGame) {
@@ -1009,6 +1022,15 @@ int main(void)
 				bigCloud.y = HEIGHT;
 				endCloud.y = HEIGHT;
 				screenScore.y = -HEIGHT;
+
+				number[0].x = 405;
+				number[0].y = 20;
+				number[1].x = 360;
+				number[1].y = 20;
+				number[2].x = 315;
+				number[2].y = 20;
+				number[3].x = 270;
+				number[3].y = 20;
 
 				for (int i = 0; i < 4; i++) {
 					textureNumber[i].x = 1;
@@ -1160,6 +1182,42 @@ int main(void)
 						if (select.x != (screenScore.x + 96) && select.x != (screenScore.x + 372))
 							select.x = screenScore.x + 96;
 					}
+					number[0].x = 705;
+					number[0].y = 365;
+					number[1].x = 660;
+					number[1].y = 365;
+					number[2].x = 615;
+					number[2].y = 365;
+					number[3].x = 570;
+					number[3].y = 365;
+
+					highScoreFile = fopen("highScore.txt", "r");
+
+					if (!highScoreFile) {
+						highScoreFile = fopen("highScore.txt", "w");
+						fclose(highScoreFile);
+						highScoreFile = fopen("highScore.txt", "r");
+					}
+
+					fscanf(highScoreFile, "%u", &highscore);
+					fclose(highScoreFile);
+
+					if (points > highscore) {
+						highscore = points;
+						highScoreFile = fopen("highScore.txt", "w");
+						fseek(highScoreFile, 0, SEEK_SET);
+						fprintf(highScoreFile, "%u\n", highscore);
+						fclose(highScoreFile);
+					}
+
+					for (int i = 0; i < 4; i++) {
+						int newPoint = (highscore / (int)(pow(10,i))) % 10;
+						textureNumberHS[i].x = puntos(newPoint);
+						textureNumberHS[i].y = 1;
+						textureNumberHS[i].w = 40;
+						textureNumberHS[i].h = 60;
+					}
+
 					stop = 1;
 				}
 
@@ -1193,8 +1251,14 @@ int main(void)
 					SDL_RenderCopy(assets->renderer, spriteGameOver, &textureGameOver, &gameOver);
 					SDL_RenderCopy(assets->renderer, spriteScreenScore, &textureScreenScore, &screenScore);
 					SDL_RenderCopy(assets->renderer, spriteEndCloud, &textureEndCloud, &endCloud);
-					if (screenScore.y == (HEIGHT/2 - 175))
+					// these will be rendered after animation is complete
+					if (screenScore.y == (HEIGHT/2 - 175)) {
 						SDL_RenderCopy(assets->renderer, spriteSelect, &textureSelect, &select);
+						for (int i = 0; i < 4; i++) {
+							SDL_RenderCopy(assets->renderer, spriteNum[i], &textureNumberHS[i], &numberHS[i]);
+							SDL_RenderCopy(assets->renderer, spriteNum[i], &textureNumber[i], &number[i]);
+						}
+					}
 				}
 
 				SDL_RenderCopy(assets->renderer, spriteBigCloud, &texturebigCloud, &bigCloud);

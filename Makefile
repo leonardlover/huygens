@@ -1,7 +1,7 @@
 CC := gcc
 INCLUDEDIR := include
 OBJSRCDIR := include/src
-CFLAGS := -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lm -g
+CFLAGS := -lSDL2 -lSDL2_image -lSDL2_mixer -lm -g
 SRC := huygens.c
 EXE := Huygens.exe
 
