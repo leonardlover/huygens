@@ -812,6 +812,10 @@ int main(void)
 		SDL_Rect campRot = {0,0,WIDTH,HEIGHT};
 		SDL_Rect textureCampRot = {0,0,WIDTH,HEIGHT};
 
+		SDL_Texture *spriteCrown = _loadTexture("media/img/Crown.png", assets, error);
+		SDL_Rect crown = {790,320,136,81};
+		SDL_Rect textureCrown = {0,0,136,81};
+
 		float yMove = -2;
 		float bigCMove = 0;
 		float scoreMove = 10;
@@ -992,6 +996,7 @@ int main(void)
 
 			if (reset == 2) {
 				//printf("REPITO!\n");
+				textureCrown.w = 0;
 				scoreMove = 10;
 				campMove = 10;
 				textMove = 5;
@@ -1203,6 +1208,7 @@ int main(void)
 					fclose(highScoreFile);
 
 					if (points > highscore) {
+						textureCrown.w = 136;
 						highscore = points;
 						highScoreFile = fopen("highScore.txt", "w");
 						fseek(highScoreFile, 0, SEEK_SET);
@@ -1258,6 +1264,7 @@ int main(void)
 							SDL_RenderCopy(assets->renderer, spriteNum[i], &textureNumberHS[i], &numberHS[i]);
 							SDL_RenderCopy(assets->renderer, spriteNum[i], &textureNumber[i], &number[i]);
 						}
+						SDL_RenderCopy(assets->renderer, spriteCrown, &textureCrown, &crown);
 					}
 				}
 
