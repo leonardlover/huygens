@@ -69,6 +69,9 @@ int main(void)
 		return 1;
 	}
 
+	/* Lower volume to not fall of the chair in fear of loudness */
+	Mix_VolumeMusic(8);
+
 	/* Create game assets, a manager for game data */
 	struct GameAssets *assets = createGameAssets("Go! Sheep Dog!", error);
 	if (!assets)
