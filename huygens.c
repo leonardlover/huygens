@@ -1311,13 +1311,12 @@ int main(void)
 
 		if (background)
 			SDL_DestroyTexture(background);
-
 		if (campanil)
 			SDL_DestroyTexture(campanil);
-
+		if (spriteCrown)
+			SDL_DestroyTexture(spriteCrown);
 		if (sheet)
 			SDL_DestroyTexture(sheet);
-
 		if (standaloneSkin)
 			SDL_DestroyTexture(standaloneSkin);
 	}
